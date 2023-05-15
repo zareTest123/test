@@ -1,6 +1,12 @@
 pipeline {
     agent any
     stages {
+        stage('Configure microK8s permissions') {
+            steps {
+                sh 'sudo usermod -a -G microk8s jenkins'
+                sh 'sudo chown -R jenkins ~/.kube'
+            }
+        }
         stage('Check Namespace') {
             steps {
                 script {
@@ -31,13 +37,5 @@ pipeline {
                 }
             }
         }
-    }
-}
-
-// Add commands to add Jenkins user to microk8s group and change ownership of .kube directory
-stage('Configure microK8s permissions') {
-    steps {
-        sh 'sudo usermod -a -G microk8s jenkins'
-        sh 'sudo chown -R jenkins ~/.kube'
     }
 }
