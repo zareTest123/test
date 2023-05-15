@@ -6,6 +6,7 @@ pipeline {
             steps {
                 script {
                     sh 'sudo usermod -a -G microk8s jenkins'
+                    sh 'sudo chown -R jenkins ~/.kube'
                     sh 'newgrp microk8s'
                     def namespaceExists = sh(script: 'microk8s kubectl get namespace wp', returnStatus: true)
                     if (namespaceExists != 0) {
@@ -21,6 +22,28 @@ pipeline {
                     if (releaseStatus != 0) {
                         sh 'microk8s helm repo add bitnami https://charts.bitnami.com/bitnami'
                         sh 'microk8s helm upgrade --install final-project-wp-scalefocus bitnami/wordpress -n wp -f charts/bitnami/wordpress/values.yaml'
+                        
+                        sh '''
+                        cat <<EOF | microk8s.kubectl apply -f -
+                        apiVersion: networking.k8s.io/v1
+                        kind: Ingress
+                        metadata:
+                          name: wordpress-ingress
+                          namespace: wp
+                        spec:
+                          rules:
+                            - host: localhost
+                              http:
+                                paths:
+                                  - pathType: Prefix
+                                    path: /
+                                    backend:
+                                      service:
+                                        name: final-project-wp-scalefocus
+                                        port:
+                                          number: 80
+                        EOF
+                        '''
                     }
                 }
             }
