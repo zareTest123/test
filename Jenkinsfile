@@ -21,4 +21,10 @@ pipeline {
                     def releaseStatus = sh(script: 'microk8s helm status final-project-wp-scalefocus -n wp', returnStatus: true)
                     if (releaseStatus != 0) {
                         sh 'microk8s helm repo add bitnami https://charts.bitnami.com/bitnami'
-                        sh '
+                        sh 'microk8s helm upgrade --install final-project-wp-scalefocus bitnami/wordpress -n wp -f values.yaml'
+                    }
+                }
+            }
+        }
+    }
+}
