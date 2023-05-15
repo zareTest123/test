@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    options {
+        runAsUser('root')
+    }
     stages {
         stage('Configure microK8s permissions') {
             steps {
