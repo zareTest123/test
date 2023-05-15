@@ -6,7 +6,6 @@ pipeline {
             steps {
                 script {
                     sh 'sudo usermod -a -G microk8s jenkins'
-                    sh 'sudo chown -R jenkins ~/.kube'
                     sh 'newgrp microk8s'
                     def namespaceExists = sh(script: 'microk8s kubectl get namespace wp', returnStatus: true)
                     if (namespaceExists != 0) {
