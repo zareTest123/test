@@ -15,6 +15,7 @@ pipeline {
                 }
             }
         }
+
         stage('Create StorageClass') {
             steps {
                 script {
@@ -30,6 +31,8 @@ pipeline {
                     '''
                 }
             }
+        }
+
         stage('Check and Install WordPress') {
             steps {
                 script {
