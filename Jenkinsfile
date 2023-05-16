@@ -20,14 +20,14 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    microk8s kubectl apply -f - <<EOF
+                    echo '
                     apiVersion: storage.k8s.io/v1
                     kind: StorageClass
                     metadata:
                       name: microk8s-storage
                     provisioner: kubernetes.io/no-provisioner
                     volumeBindingMode: WaitForFirstConsumer
-                    EOF
+                    ' | microk8s kubectl apply -f -
                     '''
                 }
             }
@@ -39,28 +39,29 @@ pipeline {
                     def releaseStatus = sh(script: 'microk8s helm status final-project-wp-scalefocus -n wp', returnStatus: true)
                     if (releaseStatus != 0) {
                         sh 'microk8s helm repo add bitnami https://charts.bitnami.com/bitnami'
+                        sh 'microk8s kubectl apply -f storage-class.yaml'
                         sh 'microk8s helm upgrade --install final-project-wp-scalefocus bitnami/wordpress -n wp -f charts/bitnami/wordpress/values.yaml'
                         
                         sh '''
-                        cat <<EOF | microk8s kubectl apply -f -
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: wordpress-ingress
-  namespace: wp
-spec:
-  rules:
-    - host: localhost
-      http:
-        paths:
-          - pathType: Prefix
-            path: /
-            backend:
-              service:
-                name: final-project-wp-scalefocus
-                port:
-                  number: 80
-EOF
+                        echo '
+                        apiVersion: networking.k8s.io/v1
+                        kind: Ingress
+                        metadata:
+                          name: wordpress-ingress
+                          namespace: wp
+                        spec:
+                          rules:
+                            - host: localhost
+                              http:
+                                paths:
+                                  - pathType: Prefix
+                                    path: /
+                                    backend:
+                                      service:
+                                        name: final-project-wp-scalefocus
+                                        port:
+                                          number: 80
+                        ' | microk8s.kubectl apply -f -
                         '''
                     }
                 }
