@@ -43,29 +43,4 @@ pipeline {
                         sh 'microk8s helm upgrade --install final-project-wp-scalefocus bitnami/wordpress -n wp -f charts/bitnami/wordpress/values.yaml'
                         
                         sh '''
-                        cat <<EOF | microk8s.kubectl apply -f -
-                        apiVersion: networking.k8s.io/v1
-                        kind: Ingress
-                        metadata:
-                          name: wordpress-ingress
-                          namespace: wp
-                        spec:
-                          rules:
-                            - host: localhost
-                              http:
-                                paths:
-                                  - pathType: Prefix
-                                    path: /
-                                    backend:
-                                      service:
-                                        name: final-project-wp-scalefocus
-                                        port:
-                                          number: 80
-                        EOF
-                        '''
-                    }
-                }
-            }
-        }
-    }
-}
+                        cat <<EOF | microk
