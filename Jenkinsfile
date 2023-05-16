@@ -43,23 +43,23 @@ pipeline {
                         
                         sh '''
                         cat <<EOF | microk8s kubectl apply -f -
-                        apiVersion: v1
-                        kind: Service
-                        metadata:
-                          name: final-project-wp-scalefocus
-                          namespace: wp
-                        spec:
-                          type: LoadBalancer
-                          ports:
-                            - name: http
-                              port: 80
-                              targetPort: http
-                            - name: https
-                              port: 443
-                              targetPort: https
-                          selector:
-                            app.kubernetes.io/name: final-project-wp-scalefocus
-                        EOF
+apiVersion: v1
+kind: Service
+metadata:
+  name: final-project-wp-scalefocus
+  namespace: wp
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+    - name: https
+      port: 443
+      targetPort: 8443
+  selector:
+    app.kubernetes.io/name: final-project-wp-scalefocus
+EOF
                         '''
                     }
                 }
