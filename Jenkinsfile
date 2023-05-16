@@ -15,6 +15,21 @@ pipeline {
                 }
             }
         }
+        stage('Create StorageClass') {
+            steps {
+                script {
+                    sh '''
+                    microk8s kubectl apply -f - <<EOF
+                    apiVersion: storage.k8s.io/v1
+                    kind: StorageClass
+                    metadata:
+                      name: microk8s-storage
+                    provisioner: kubernetes.io/no-provisioner
+                    volumeBindingMode: WaitForFirstConsumer
+                    EOF
+                    '''
+                }
+            }
         stage('Check and Install WordPress') {
             steps {
                 script {
