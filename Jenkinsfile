@@ -43,4 +43,28 @@ pipeline {
                         sh 'microk8s helm upgrade --install final-project-wp-scalefocus bitnami/wordpress -n wp -f charts/bitnami/wordpress/values.yaml'
                         
                         sh '''
-                        cat <<EOF | microk
+                        cat <<EOF | microk8s kubectl apply -f -
+                        apiVersion: v1
+                        kind: Service
+                        metadata:
+                          name: final-project-wp-scalefocus
+                          namespace: wp
+                        spec:
+                          type: LoadBalancer
+                          ports:
+                            - name: http
+                              port: 80
+                              targetPort: http
+                            - name: https
+                              port: 443
+                              targetPort: https
+                          selector:
+                            app.kubernetes.io/name: final-project-wp-scalefocus
+                        EOF
+                        '''
+                    }
+                }
+            }
+        }
+    }
+}
